@@ -1,0 +1,34 @@
+import 'package:flutter/material.dart';
+
+class ItemTile extends StatelessWidget {
+  final String name;
+  final int price;
+  final ValueChanged<int> onQuantityChanged;
+
+  ItemTile({
+    required this.name,
+    required this.price,
+    required this.onQuantityChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(name),
+      subtitle: Text('Harga: Rp$price'),
+      trailing: Container(
+        width: 100,
+        child: TextField(
+          decoration: InputDecoration(
+            hintText: 'Jumlah',
+          ),
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            int quantity = int.tryParse(value) ?? 0;
+            onQuantityChanged(quantity);
+          },
+        ),
+      ),
+    );
+  }
+}
