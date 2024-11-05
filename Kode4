@@ -1,0 +1,124 @@
+import 'package:flutter/material.dart';
+import 'widgets/item_tile.dart';
+
+class TransaksiToko extends StatefulWidget {
+  @override
+  _TransaksiTokoState createState() => _TransaksiTokoState();
+}
+
+class _TransaksiTokoState extends State<TransaksiToko> {
+  final List<Map<String, dynamic>> _items = [
+    {'name': 'Laptop', 'price': 15000000, 'quantity': 0},
+    {'name': 'Mouse', 'price': 50000, 'quantity': 0},
+    {'name': 'Keyboard', 'price': 100000, 'quantity': 0},
+    {'name': 'Monitor', 'price': 2000000, 'quantity': 0},
+    {'name': 'Printer', 'price': 1500000, 'quantity': 0},
+  ];
+
+  int _totalBayar = 0;
+
+  void _hitungTotalBayar() {
+    int total = 0;
+    for (var item in _items) {
+      total += item['price'] * item['quantity'];
+    }
+    setState(() {
+      _totalBayar = total;
+    });
+  }
+
+  void _reset() {
+    setState(() {
+      for (var item in _items) {
+        item['quantity'] = 0;
+      }
+      _totalBayar = 0;
+    });
+  }
+
+  void _cetakStruk() {
+    _hitungTotalBayar();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Struk Pembayaran'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: _items
+                .where((item) => item['quantity'] > 0)
+                .map((item) => ListTile(
+                      title: Text(item['name']),
+                      subtitle: Text('Harga: Rp${item['price']}'),
+                      trailing: Text(
+                          'Subtotal: Rp${item['price'] * item['quantity']}'),
+                    ))
+                .toList(),
+          ),
+          actions: [
+            Text('Total Bayar: Rp$_totalBayar'),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Tutup'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Catatan Transaksi Toko Komputer'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: _items.length,
+                itemBuilder: (context, index) {
+                  var item = _items[index];
+                  return ItemTile(
+                    name: item['name'],
+                    price: item['price'],
+                    onQuantityChanged: (quantity) {
+                      setState(() {
+                        item['quantity'] = quantity;
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: _reset,
+                  child: Text('Reset'),
+                ),
+                ElevatedButton(
+                  onPressed: _cetakStruk,
+                  child: Text('Cetak Struk'),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'Total Bayar: Rp$_totalBayar',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
